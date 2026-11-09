@@ -80,7 +80,7 @@ function say(t,p=1){return new Promise(async res=>{
  setTimeout(()=>{if(!ok&&!speechSynthesis.speaking&&!speechSynthesis.pending){toast("소리가 나지 않아요. 무음 모드를 끄고, 안 되면 브라우저에서 열어 주세요");res()}},2500)
 })}
 async function seq(items,loop){const my=++tok;speechSynthesis.cancel();playing=true;do{for(const it of items){if(my!==tok)return;await say(it[0],it[1]);await sleep(500)}}while(loop&&my===tok);if(my===tok)playing=false}
-function stop(){tok++;try{speechSynthesis.cancel()}catch(e){}playing=false}
+function stop(){tok++;try{speechSynthesis.cancel()}catch(e){}playing=false;try{RP.rec&&RP.rec.abort()}catch(e){}if(RP.on){RP.on=false;RP.st="idle";autoUI()}}
 setInterval(()=>{if(playing){const d=day();d.l++;if(d.l%5==0)save();const e=$("#lt");if(e)e.textContent=Math.floor(d.l/60)+"분 "+d.l%60+"초"}},1000);
 let stream,mr,ch;
 async function rec(id,btn){
@@ -93,6 +93,39 @@ async function rec(id,btn){
  mr.start();btn.textContent="⏹ 멈추기";btn.classList.add("rec")
 }
 const sp=()=>`<div class="row"><span class="tag">속도</span><select id="sp">${[0.6,0.75,0.85,1].map(v=>`<option ${v==SP?"selected":""}>${v}</option>`).join("")}</select></div>`;
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let RP={on:false,i:0,st:"idle",heard:"",pass:0,tot:0,tries:0,p:0,miss:[],rec:null,err:null,skipFlag:false};
+const norm=s=>s.toLowerCase().replace(/[’']/g,"").replace(/[^a-z0-9 ]/g," ").split(/\s+/).filter(Boolean);
+function score(tg,heard){const t=norm(tg),pool=norm(heard),miss=[];let hit=0;t.forEach(w=>{const k=pool.indexOf(w);if(k>=0){pool.splice(k,1);hit++}else miss.push(w)});return{p:t.length?hit/t.length:0,miss}}
+function listenOnce(){return new Promise(res=>{const r=new SR();RP.rec=r;RP.heard="";RP.err=null;r.lang="en-US";r.interimResults=true;
+ r.onresult=e=>{let t="";for(let k=0;k<e.results.length;k++)t+=e.results[k][0].transcript+" ";RP.heard=t.trim();autoUI()};
+ r.onerror=e=>{RP.err=e.error};r.onend=()=>res(RP.heard);
+ try{r.start()}catch(x){RP.err="start";res("")}})}
+function autoUI(){const e=$("#ast");if(!e)return;const w=W[cw()-1],i=RP.i,t=w.d[i]||"",p=Math.round(RP.p*100);
+ const L={idle:"▶ 시작을 누르면 상대 대사가 자동으로 나와요",ai:"🔊 상대가 말하는 중…",me:"🎤 지금 말해 보세요!",ok:"✅ 통과! ("+p+"%)",retry:RP.tries>=3?"😊 괜찮아요, 다음으로 넘어갈게요 ("+p+"%)":"🔁 다시 해봐요 ("+RP.tries+"/3) · "+p+"%"+(RP.miss.length?" · 놓친 단어: "+RP.miss.join(", "):""),done:"🎉 완료! 통과 "+RP.pass+"/"+RP.tot,err:"마이크·음성인식이 막혀 있어요. 허용해 주거나 크롬·사파리에서 열어 주세요. 아래 수동 연습은 그대로 쓸 수 있어요"};
+ const pr=RP.st==="done"?100:RP.st==="idle"?0:i/w.d.length*100;
+ let h=`<div class="bar"><i style="width:${pr}%"></i></div><div style="margin-top:6px"><b>${L[RP.st]||""}</b></div>`;
+ if(["ai","me","ok","retry"].includes(RP.st))h+=`<div class="en" style="margin-top:6px">${t}</div>`;
+ if(RP.heard&&(RP.st==="me"||RP.st==="retry"))h+=`<div class="sub">들린 말: ${RP.heard.replace(/</g,"&lt;")}</div>`;
+ e.innerHTML=h}
+async function auto(){const my=++tok,w=W[cw()-1];speechSynthesis.cancel();RP.on=true;RP.pass=0;RP.tries=0;RP.miss=[];RP.tot=w.d.filter((_,k)=>(k%2==1)!==swap).length;
+ for(let i=0;i<w.d.length;i++){
+  RP.i=i;const me=(i%2==1)!==swap,t=w.d[i];
+  if(!me){RP.st="ai";autoUI();await say(t,i%2?0.9:1.15);if(my!==tok)return;await sleep(300);continue}
+  let tries=0;
+  for(;;){
+   RP.st="me";RP.tries=tries;autoUI();const h=await listenOnce();if(my!==tok)return;
+   if(RP.skipFlag){RP.skipFlag=false;break}
+   if(["not-allowed","service-not-allowed","start"].includes(RP.err)){RP.st="err";RP.on=false;autoUI();return}
+   const s=score(t,h);RP.p=s.p;RP.miss=s.miss;
+   if(s.p>=0.7){RP.pass++;RP.st="ok";autoUI();await sleep(1000);break}
+   tries++;RP.tries=tries;RP.st="retry";autoUI();
+   if(tries>=3){await sleep(1800);break}
+   await sleep(900);if(my!==tok)return;await say(t,1);if(my!==tok)return
+  }
+  if(my!==tok)return
+ }
+ const d=day();d.r++;save();RP.on=false;RP.st="done";render();toast("🎉 역할극 완료!")}
 function dash(){const d=day(),r=Math.round(rate(d)*100),w=cw();
  const gs=[["🎧 듣기",d.l/600,Math.floor(d.l/60)+"/10분"],["🗣 따라말하기",d.s.length/6,d.s.length+"/6문장"],["🎭 역할극",d.r,d.r+"/1회"],["🎙 녹음",d.c/3,d.c+"/3개"]];
  let h=`<div class="c"><div class="ring"><svg viewBox="0 0 120 120" width="130" height="130"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--bd)" stroke-width="12"/><circle cx="60" cy="60" r="52" fill="none" stroke="${r>=100?"var(--ok)":"var(--pr)"}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${3.267*r} 327" transform="rotate(-90 60 60)"/></svg><b>${r}%</b></div><div class="sub" style="text-align:center">오늘의 달성률 · Week ${w}: ${W[w-1].t}</div></div><div class="c"><b>오늘의 목표</b>`;
@@ -113,10 +146,10 @@ function shadow(){const w=W[cw()-1],d=day();
  w.s.map((t,i)=>{const id="s"+cw()+"-"+i,dn=d.s.includes(id);return `<div class="c"><div class="en">${t}</div><div class="row"><button class="b" data-a="sp" data-i="${i}">▶ 원어민</button><button class="b" data-a="rc" data-id="${id}">🎙 녹음</button><button class="b" data-a="mp" data-id="${id}" ${R[id]?"":"disabled"}>▶ 내 목소리</button><button class="b ${dn?"ok":""}" data-a="dn" data-id="${id}">${dn?"✅ 완료":"☑ 따라했어요"}</button></div></div>`}).join("")}
 function role(){const w=W[cw()-1],d=day();
  return `<div class="c"><b>🎭 역할극 · 오늘 ${d.r}회 완료</b><div class="sub">지금 내 역할: ${swap?"A (질문하는 사람)":"B (대답하는 사람)"} · 파란 줄이 내 대사예요</div>${sp()}
- <div class="row" style="margin-top:8px"><button class="b p" data-a="ra">▶ 전체 듣기</button><button class="b" data-a="sw">🔁 역할 바꾸기</button><button class="b" data-a="st">⏹</button></div></div>`+
+ <div class="row" style="margin-top:8px"><button class="b p" data-a="ra">▶ 전체 듣기</button><button class="b" data-a="sw">🔁 역할 바꾸기</button><button class="b" data-a="st">⏹</button></div></div><div class="c"><b>🎬 자동 대화 모드</b><div class="sub">상대 말은 자동 재생, 내 차례에 말하면 발음을 바로 체크해요 (70% 이상 통과)</div><div id="ast" style="margin:8px 0"></div><div class="row"><button class="b p" data-a="as">🎬 시작</button><button class="b" data-a="ak">⏭ 건너뛰기</button><button class="b" data-a="st">⏹ 중지</button></div></div><div class="tag" style="margin:12px 0 0">✋ 수동 연습 (한 줄씩 재생·녹음)</div>`+
  w.d.map((t,i)=>{const me=(i%2==1)!==swap,id="r"+cw()+"-"+i;return me?`<div class="c me"><div class="tag">나</div><div class="en">${t}</div><div class="row"><button class="b" data-a="rc" data-id="${id}">🎙 녹음</button><button class="b" data-a="mp" data-id="${id}" ${R[id]?"":"disabled"}>▶ 내 목소리</button></div></div>`:`<div class="c ai"><div class="tag">상대 (AI·부모님)</div><div class="en">${t}</div><button class="b" data-a="lp" data-i="${i}">▶ 듣기</button></div>`}).join("")+
  `<button class="b ok" style="width:100%" data-a="fin">✔ 역할극 한 번 끝냈어요</button>`}
-function render(){document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.t===tab));$("#v").innerHTML=({d:dash,l:listen,s:shadow,r:role})[tab]();$("#wk").value=cw();$("#wt").textContent=W[cw()-1].t}
+function render(){document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.t===tab));$("#v").innerHTML=({d:dash,l:listen,s:shadow,r:role})[tab]();$("#wk").value=cw();$("#wt").textContent=W[cw()-1].t;if(tab==="r")autoUI()}
 document.addEventListener("click",e=>{
  const n=e.target.closest("nav button");if(n){stop();tab=n.dataset.t;render();return}
  const b=e.target.closest("[data-a]");if(!b)return;const a=b.dataset.a,i=+b.dataset.i,id=b.dataset.id,w=W[cw()-1],d=day();
@@ -128,6 +161,8 @@ document.addEventListener("click",e=>{
  if(a==="lp"){stop();say(w.d[i],i%2?0.9:1.15);return}
  if(a==="st"){stop();return}
  if(a==="tt"){stop();say("Hello! Can you hear me?");return}
+ if(a==="as"){if(!SR){toast("이 화면은 실시간 발음 체크를 지원하지 않아요. 크롬(안드로이드·PC)이나 사파리에서 링크를 열어 주세요");return}stop();auto();return}
+ if(a==="ak"){if(RP.on&&RP.st==="me"){RP.skipFlag=true;try{RP.rec.abort()}catch(e){}}return}
  if(a==="rc"){rec(id,b);return}
  if(a==="mp"){if(R[id])new Audio(R[id]).play();return}
  if(a==="dn"){const x=d.s.indexOf(id);x<0?d.s.push(id):d.s.splice(x,1);save();render();return}
