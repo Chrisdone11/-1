@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>초4 영어회화 12주 코치</title>
+<style>
+:root{--bg:#f4f6fb;--cd:#fff;--tx:#1d2433;--mu:#6b7488;--pr:#4f7cff;--ok:#1f9d68;--bd:#e2e6ef;--rc:#e5484d;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151c;--cd:#1c212c;--tx:#eef1f8;--mu:#9aa3b8;--pr:#7b9cff;--ok:#3ccf91;--bd:#2c3342;--rc:#ff6b70}}
+:root[data-theme="dark"]{--bg:#12151c;--cd:#1c212c;--tx:#eef1f8;--mu:#9aa3b8;--pr:#7b9cff;--ok:#3ccf91;--bd:#2c3342;--rc:#ff6b70}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font:16px/1.5 -apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;padding-bottom:70px}
+header{padding:14px 16px 6px}h1{font-size:19px;margin:0}
+.sub{color:var(--mu);font-size:13px}
+select,button{font:inherit;color:var(--tx)}
+select{background:var(--cd);border:1px solid var(--bd);border-radius:10px;padding:6px 8px;max-width:100%}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--cd);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom,0px);z-index:5}
+nav button{flex:1;border:0;background:none;padding:10px 0;font-size:12px;color:var(--mu)}
+nav button.on{color:var(--pr);font-weight:700}
+main{padding:8px 14px;max-width:640px;margin:auto}
+.c{background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:12px;margin:10px 0}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.b{border:1px solid var(--bd);background:var(--cd);border-radius:10px;padding:8px 12px;cursor:pointer}
+.b.p{background:var(--pr);border-color:var(--pr);color:#fff}
+.b.rec{background:var(--rc);border-color:var(--rc);color:#fff}
+.b.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.b:disabled{opacity:.4}
+.en{font-size:19px;font-weight:600;margin-bottom:8px}
+.bar{height:10px;background:var(--bd);border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--pr)}
+.bar i.f{background:var(--ok)}
+.g{margin:8px 0}.g div:first-child{display:flex;justify-content:space-between;font-size:14px;margin-bottom:3px}
+.ring{position:relative;width:130px;height:130px;margin:auto}.ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:28px}
+.wk{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.wk div{text-align:center;font-size:11px;border-radius:8px;padding:6px 0;background:var(--bd)}
+.wk div.n{outline:2px solid var(--pr)}
+.d7{display:flex;gap:6px;align-items:flex-end;height:80px}.d7 div{flex:1;text-align:center;font-size:11px;color:var(--mu)}.d7 i{display:block;background:var(--pr);border-radius:4px 4px 0 0;min-height:2px}
+.me{border-left:4px solid var(--pr)}.ai{border-left:4px solid var(--bd)}
+.tag{font-size:12px;color:var(--mu)}
+#t{position:fixed;left:50%;bottom:80px;transform:translateX(-50%);background:#222;color:#fff;padding:8px 14px;border-radius:20px;font-size:14px;display:none;z-index:9;max-width:90%}
+</style></head><body>
+<header><h1>🗣️ 초4 영어회화 12주 코치</h1>
+<div class="row"><select id="wk"></select><span class="sub" id="wt"></span></div></header>
+<main id="v"></main>
+<nav><button data-t="d">📊 대시보드</button><button data-t="l">🎧 듣기</button><button data-t="s">🗣 따라말하기</button><button data-t="r">🎭 역할극</button></nav>
+<div id="t"></div>
+<script>
+const W=[
+["자기소개","Hi, my name is Minjun.|I am ten years old.|I live in Seoul.|I am in fourth grade.|I like soccer.|Nice to meet you!","Hi! What’s your name?|My name is Minjun.|How old are you?|I am ten years old."],
+["가족·친구","This is my mom.|I have a little sister.|He is my best friend.|We play together every day.|My dad is very tall.|I love my family.","Who is he?|He is my best friend.|What do you do together?|We play soccer together."],
+["좋아하는 것","I like pizza.|My favorite color is blue.|I love playing games.|I don’t like carrots.|What do you like?|Soccer is my favorite sport.","What is your favorite food?|My favorite food is pizza.|Why do you like it?|Because it is delicious."],
+["학교생활","I go to school by bus.|My favorite subject is math.|I have lunch at school.|Can I go to the bathroom?|I don’t understand.|Please say it again.","What subject do you like?|I like science.|What do you do at recess?|I play with my friends."],
+["가게·식당 주문","I would like a hamburger.|Can I have some water, please?|How much is it?|Here you are.|That’s all, thank you.|It is very good.","Hello! What would you like?|I would like a hamburger, please.|Anything else?|Water, please. How much is it?"],
+["길 묻기","Where is the park?|Go straight.|Turn left at the corner.|It is next to the school.|Is it far?|Thank you for your help.","Excuse me. Where is the park?|Go straight and turn left.|Is it far?|No, it is next to the school."],
+["놀자고 하기","Do you want to play?|Let’s go to the park.|What should we play?|That sounds fun!|I can’t today.|Maybe tomorrow.","Do you want to play soccer?|Yes, let’s go to the park!|What time?|Let’s meet at three."],
+["아플 때·몸","I have a headache.|I feel tired.|My stomach hurts.|I need some rest.|I am feeling better.|Please call my mom.","What’s wrong?|I have a stomachache.|Do you want to rest?|Yes, please."],
+["어제 한 일","Yesterday I played soccer.|I watched a movie.|We went to the park.|I ate pizza for dinner.|I did my homework.|It was fun.","What did you do yesterday?|I played soccer with my friends.|Was it fun?|Yes, it was very fun!"],
+["주말 계획","I’m going to visit my grandma.|We are going to eat out.|I will play games.|I want to go swimming.|What are you going to do?|I can’t wait!","What are you going to do this weekend?|I am going to go swimming.|Who are you going with?|I am going with my dad."],
+["이유 말하기","I like summer because I can swim.|I am happy because it is Friday.|I like dogs because they are cute.|I study English because it is fun.|Why do you like it?|That’s why I like it.","Why do you like dogs?|Because they are cute.|Do you have a dog?|No, but I want one."],
+["1분 발표","Hello, everyone.|Today I will talk about my hobby.|My hobby is soccer.|I play it every weekend.|It makes me happy.|Thank you for listening.","Please introduce your hobby.|My hobby is soccer.|Why do you like it?|Because it makes me happy."]
+].map(a=>({t:a[0],s:a[1].split("|"),d:a[2].split("|")}));
+const $=s=>document.querySelector(s),sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const pad=n=>String(n).padStart(2,"0"),fmt=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const add=(s,n)=>{const d=new Date(s+"T00:00");d.setDate(d.getDate()+n);return fmt(d)};
+let S=null;try{S=JSON.parse(localStorage.getItem("eng4"))}catch(e){}
+S=S||{start:fmt(new Date()),days:{},week:null};
+const save=()=>{try{localStorage.setItem("eng4",JSON.stringify(S))}catch(e){}};
+const TD=()=>fmt(new Date());
+const day=(k=TD())=>S.days[k]||(S.days[k]={l:0,s:[],r:0,c:0});
+const cw=()=>S.week||Math.min(12,Math.max(1,Math.floor((new Date(TD()+"T00:00")-new Date(S.start+"T00:00"))/6048e5)+1));
+const rate=d=>d?(Math.min(1,d.l/600)+Math.min(1,d.s.length/6)+Math.min(1,d.r/1)+Math.min(1,d.c/3))/4:0;
+let tab="d",SP=0.85,swap=false,tok=0,playing=false;const R={};
+function toast(m){const t=$("#t");t.textContent=m;t.style.display="block";clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display="none",3000)}
+const U=[];
+function say(t,p=1){return new Promise(async res=>{
+ if(!("speechSynthesis" in window)||typeof SpeechSynthesisUtterance==="undefined"){toast("이 화면에서는 음성 재생이 지원되지 않아요. 크롬·사파리 같은 브라우저에서 링크를 열어 주세요");res();return}
+ await sleep(150);
+ const u=new SpeechSynthesisUtterance(t);u.lang="en-US";u.rate=SP;u.pitch=p;u.volume=1;
+ let v=speechSynthesis.getVoices().filter(x=>/^en/i.test(x.lang));const us=v.filter(x=>/en[-_]US/i.test(x.lang));if(us.length)v=us;
+ if(v.length)u.voice=p>1?v[0]:v[v.length-1];
+ U.push(u);let ok=false;
+ u.onstart=()=>{ok=true};u.onend=()=>res();u.onerror=e=>{if(e.error!=="interrupted"&&e.error!=="canceled")toast("음성 오류("+e.error+") · 기기 볼륨과 무음 모드를 확인해 주세요");res()};
+ speechSynthesis.resume();speechSynthesis.speak(u);
+ setTimeout(()=>{if(!ok&&!speechSynthesis.speaking&&!speechSynthesis.pending){toast("소리가 나지 않아요. 무음 모드를 끄고, 안 되면 브라우저에서 열어 주세요");res()}},2500)
+})}
+async function seq(items,loop){const my=++tok;speechSynthesis.cancel();playing=true;do{for(const it of items){if(my!==tok)return;await say(it[0],it[1]);await sleep(500)}}while(loop&&my===tok);if(my===tok)playing=false}
+function stop(){tok++;try{speechSynthesis.cancel()}catch(e){}playing=false}
+setInterval(()=>{if(playing){const d=day();d.l++;if(d.l%5==0)save();const e=$("#lt");if(e)e.textContent=Math.floor(d.l/60)+"분 "+d.l%60+"초"}},1000);
+let stream,mr,ch;
+async function rec(id,btn){
+ if(mr&&mr.state==="recording"){mr.stop();return}
+ stop();
+ try{stream=stream||await navigator.mediaDevices.getUserMedia({audio:true})}catch(e){toast("마이크가 막혀 있어요. 브라우저에서 마이크를 허용해 주세요 (안 되면 새 탭에서 열기)");return}
+ ch=[];mr=new MediaRecorder(stream);
+ mr.ondataavailable=e=>ch.push(e.data);
+ mr.onstop=()=>{R[id]=URL.createObjectURL(new Blob(ch,{type:mr.mimeType}));const d=day();d.c++;save();render()};
+ mr.start();btn.textContent="⏹ 멈추기";btn.classList.add("rec")
+}
+const sp=()=>`<div class="row"><span class="tag">속도</span><select id="sp">${[0.6,0.75,0.85,1].map(v=>`<option ${v==SP?"selected":""}>${v}</option>`).join("")}</select></div>`;
+function dash(){const d=day(),r=Math.round(rate(d)*100),w=cw();
+ const gs=[["🎧 듣기",d.l/600,Math.floor(d.l/60)+"/10분"],["🗣 따라말하기",d.s.length/6,d.s.length+"/6문장"],["🎭 역할극",d.r,d.r+"/1회"],["🎙 녹음",d.c/3,d.c+"/3개"]];
+ let h=`<div class="c"><div class="ring"><svg viewBox="0 0 120 120" width="130" height="130"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--bd)" stroke-width="12"/><circle cx="60" cy="60" r="52" fill="none" stroke="${r>=100?"var(--ok)":"var(--pr)"}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${3.267*r} 327" transform="rotate(-90 60 60)"/></svg><b>${r}%</b></div><div class="sub" style="text-align:center">오늘의 달성률 · Week ${w}: ${W[w-1].t}</div></div><div class="c"><b>오늘의 목표</b>`;
+ gs.forEach(g=>{const p=Math.min(1,g[1]);h+=`<div class="g"><div><span>${g[0]}</span><span>${g[2]}</span></div><div class="bar"><i class="${p>=1?"f":""}" style="width:${p*100}%"></i></div></div>`});
+ h+=`<div class="row"><button class="b" data-a="p5">🎧 외부 영상·책 듣기 +5분</button></div></div>`;
+ let st=0,k=TD();if(rate(S.days[k])<0.8)k=add(k,-1);while(rate(S.days[k])>=0.8){st++;k=add(k,-1)}
+ h+=`<div class="c"><b>🔥 연속 달성 ${st}일</b> <span class="tag">(달성률 80% 이상인 날)</span><div class="d7" style="margin-top:8px">`;
+ for(let i=6;i>=0;i--){const k=add(TD(),-i),p=Math.round(rate(S.days[k])*100);h+=`<div><i style="height:${p*0.6}px"></i>${p}%<br>${k.slice(8)}일</div>`}
+ h+=`</div></div><div class="c"><b>12주 진행도</b><div class="wk" style="margin-top:8px">`;
+ for(let i=0;i<12;i++){let sm=0;for(let j=0;j<7;j++)sm+=rate(S.days[add(S.start,i*7+j)]);h+=`<div class="${i+1==w?"n":""}">W${i+1}<br><b>${Math.round(sm/7*100)}%</b></div>`}
+ return h+`</div><p class="tag">시작일 ${S.start} · <a href="#" data-a="rs">오늘부터 다시 시작</a></p></div>`}
+function listen(){const w=W[cw()-1],d=day();
+ return `<div class="c"><b>Week ${cw()}: ${w.t}</b><div class="sub">오늘 들은 시간: <b id="lt">${Math.floor(d.l/60)}분 ${d.l%60}초</b> (재생 중에 자동 기록)</div>${sp()}
+ <div class="row" style="margin-top:8px"><button class="b p" data-a="la">▶ 문장 반복 재생</button><button class="b p" data-a="ld">▶ 대화 듣기</button><button class="b" data-a="st">⏹ 멈춤</button><button class="b" data-a="tt">🔊 소리 테스트</button></div></div>`+
+ w.s.map((t,i)=>`<div class="c"><div class="en">${t}</div><button class="b" data-a="sp" data-i="${i}">▶ 듣기</button></div>`).join("")}
+function shadow(){const w=W[cw()-1],d=day();
+ return `<div class="c"><b>따라말하기 ${d.s.length}/6</b><div class="sub">① 듣기 → ② 녹음하고 따라 말하기 → ③ 내 목소리와 비교 → ④ 잘했으면 ✅</div>${sp()}</div>`+
+ w.s.map((t,i)=>{const id="s"+cw()+"-"+i,dn=d.s.includes(id);return `<div class="c"><div class="en">${t}</div><div class="row"><button class="b" data-a="sp" data-i="${i}">▶ 원어민</button><button class="b" data-a="rc" data-id="${id}">🎙 녹음</button><button class="b" data-a="mp" data-id="${id}" ${R[id]?"":"disabled"}>▶ 내 목소리</button><button class="b ${dn?"ok":""}" data-a="dn" data-id="${id}">${dn?"✅ 완료":"☑ 따라했어요"}</button></div></div>`}).join("")}
+function role(){const w=W[cw()-1],d=day();
+ return `<div class="c"><b>🎭 역할극 · 오늘 ${d.r}회 완료</b><div class="sub">지금 내 역할: ${swap?"A (질문하는 사람)":"B (대답하는 사람)"} · 파란 줄이 내 대사예요</div>${sp()}
+ <div class="row" style="margin-top:8px"><button class="b p" data-a="ra">▶ 전체 듣기</button><button class="b" data-a="sw">🔁 역할 바꾸기</button><button class="b" data-a="st">⏹</button></div></div>`+
+ w.d.map((t,i)=>{const me=(i%2==1)!==swap,id="r"+cw()+"-"+i;return me?`<div class="c me"><div class="tag">나</div><div class="en">${t}</div><div class="row"><button class="b" data-a="rc" data-id="${id}">🎙 녹음</button><button class="b" data-a="mp" data-id="${id}" ${R[id]?"":"disabled"}>▶ 내 목소리</button></div></div>`:`<div class="c ai"><div class="tag">상대 (AI·부모님)</div><div class="en">${t}</div><button class="b" data-a="lp" data-i="${i}">▶ 듣기</button></div>`}).join("")+
+ `<button class="b ok" style="width:100%" data-a="fin">✔ 역할극 한 번 끝냈어요</button>`}
+function render(){document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.t===tab));$("#v").innerHTML=({d:dash,l:listen,s:shadow,r:role})[tab]();$("#wk").value=cw();$("#wt").textContent=W[cw()-1].t}
+document.addEventListener("click",e=>{
+ const n=e.target.closest("nav button");if(n){stop();tab=n.dataset.t;render();return}
+ const b=e.target.closest("[data-a]");if(!b)return;const a=b.dataset.a,i=+b.dataset.i,id=b.dataset.id,w=W[cw()-1],d=day();
+ if(a==="rs"){e.preventDefault();if(confirm("오늘을 1일차로 다시 시작할까요? 기록은 유지돼요.")){S.start=TD();S.week=null;save();render()}return}
+ if(a==="p5"){d.l+=300;save();render();toast("듣기 5분 추가!");return}
+ if(a==="sp"){stop();say(w.s[i]);return}
+ if(a==="la"){seq(w.s.map(t=>[t,1]),true);toast("반복 재생 중 · 멈추려면 ⏹");return}
+ if(a==="ld"||a==="ra"){seq(w.d.map((t,k)=>[t,k%2?0.9:1.15]),a==="ld");return}
+ if(a==="lp"){stop();say(w.d[i],i%2?0.9:1.15);return}
+ if(a==="st"){stop();return}
+ if(a==="tt"){stop();say("Hello! Can you hear me?");return}
+ if(a==="rc"){rec(id,b);return}
+ if(a==="mp"){if(R[id])new Audio(R[id]).play();return}
+ if(a==="dn"){const x=d.s.indexOf(id);x<0?d.s.push(id):d.s.splice(x,1);save();render();return}
+ if(a==="sw"){swap=!swap;render();return}
+ if(a==="fin"){d.r++;save();render();toast("🎉 역할극 완료!")}
+});
+document.addEventListener("change",e=>{if(e.target.id==="sp"){SP=+e.target.value}if(e.target.id==="wk"){S.week=+e.target.value;save();render()}});
+$("#wk").innerHTML=W.map((w,i)=>`<option value="${i+1}">Week ${i+1}</option>`).join("");
+try{speechSynthesis.getVoices()}catch(e){}
+render();
+</script></body></html>
